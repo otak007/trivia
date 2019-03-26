@@ -14,6 +14,7 @@ Extra:
 - Beste score bold gemaakt
 - Score gesorteerd van hoog naar laag
 - Score van speler weergeven
+- Geeft aan of de speler het juiste antwoord heeft gegeven en zo niet, geeft die wat het correcte anwtoord moest zijn.
 
 ![](https://github.com/otak007/trivia/blob/master/Screenshot_20190326-200253.png)
 ![](https://github.com/otak007/trivia/blob/master/Screenshot_20190326-200256.png)
