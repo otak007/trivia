@@ -13,12 +13,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
+    // Go to new screen where the user can fill in his/her name
     public void startGame(View view){
         Intent intent = new Intent();
         intent.setClass(MainActivity.this, GetNameActivity.class);
         startActivity(intent);
     }
 
+    // Go to new screen where the scores are visible
     public void showHighscorList(View view){
 
         Intent intent = new Intent();

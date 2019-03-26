@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_margin="20dp"
     android:orientation="vertical"
     tools:context=".GetNameActivity">
 
@@ -11,7 +12,10 @@
         android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Please enter your name" />
+        android:gravity="center"
+        android:text="Please enter your name"
+        android:textStyle="bold"
+        android:textSize="20dp"/>
 
     <EditText
         android:id="@+id/name"
@@ -19,12 +23,15 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="Name"
-        android:inputType="textPersonName" />
+        android:inputType="textPersonName"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp" />
 
     <Button
         android:id="@+id/start"
-        android:layout_width="match_parent"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:onClick="start"
         android:text="Start" />
 </LinearLayout>

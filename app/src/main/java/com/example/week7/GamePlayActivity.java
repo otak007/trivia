@@ -1,5 +1,6 @@
 package com.example.week7;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
@@ -14,17 +15,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.concurrent.ThreadLocalRandom;
 
-public class GamePlayActivity extends AppCompatActivity implements QuestionRequest.Callback  {
+public class GamePlayActivity extends AppCompatActivity implements QuestionRequest.Callback, PostRequestHelper.HSCallback  {
 
 
     private TextView question;
     private ListView answersView;
     private ArrayList<String> answers;
     private ArrayList<QuestionItem> questionItems;
-    private int score;
-    private int questionNumber;
-    private int request;
+    private int score, questionNumber, gameDifficulty;
+    private AnswerAdapter adapter;
+    private String name, url;
+    private GameProperties gameProperties;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,48 +36,52 @@ public class GamePlayActivity extends AppCompatActivity implements QuestionReque
         setContentView(R.layout.activity_game_play);
 
         Intent intent = getIntent();
-        String name = (String) intent.getSerializableExtra("name");
-        Log.d("name", ""+name);
+        gameProperties = (GameProperties) intent.getSerializableExtra("Game Properties");
+        name = gameProperties.getName();
+        url = gameProperties.getUrl();
+        gameDifficulty = gameProperties.getDifficulty();
 
         question = findViewById(R.id.question);
         answersView = findViewById(R.id.answers);
-        score = 0;
-        questionNumber = 0;
-        Log.d("request: ", ""+request);
-//        questionRequest(request);
-        if (request < 1){
-            request++;
-            Log.d("new question", "reload");
-            new QuestionRequest(getApplicationContext()).getQuestionsArray(this);
+
+        // Question request, only 1 time during the game.
+        if (savedInstanceState == null) {
+
+            score = 0;
+            questionNumber = 0;
+
+            QuestionRequest qr = new QuestionRequest(getApplicationContext());
+            qr.getQuestionsArray(this, url);
         }
-        Log.d("request after", ""+request);
+
         answersView.setOnItemClickListener(new ItemClickListener());
     }
 
-    public void questionRequest(boolean alreadyRequest){
-        if (alreadyRequest == false){
-            request++;
-            Log.d("new question", "reload");
-            new QuestionRequest(getApplicationContext()).getQuestionsArray(this);
-        }
-    }
-
-
+    // save the page
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);;
 
+        outState.putSerializable("question items", questionItems);
         outState.putInt("question number", questionNumber);
-        outState.putInt("already request", request);
+        outState.putStringArrayList("answers", answers);
+
+        outState.putInt("score", score);
     }
 
     // Preserve the page after rotation
     public void onRestoreInstanceState(Bundle inState) {
         super.onRestoreInstanceState(inState);
 
+        score = inState.getInt("score");
+        answers = inState.getStringArrayList("answers");
         questionNumber = inState.getInt("question number");
-        request = inState.getInt("already request");
-        Log.d("save request", ""+request);
+        questionItems = (ArrayList<QuestionItem>) inState.getSerializable("question items");
+
+        question.setText(fromHtml(questionItems.get(questionNumber).getQuestion()));
+        adapter = new AnswerAdapter(this, R.layout.answers, answers);
+        answersView.setAdapter(adapter);
     }
+
 
     @Override
     public void gotQuestionItems(ArrayList<QuestionItem> questions)  {
@@ -82,23 +90,27 @@ public class GamePlayActivity extends AppCompatActivity implements QuestionReque
     }
 
 
+    // show a message when question request failed
     @Override
     public void gotQuestionItemsError(String message) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 
+
+    // Show the questions on the screen
     public void showQuestion(int number){
 
         question.setText(fromHtml(questionItems.get(number).getQuestion()));
         answers = questionItems.get(number).getIncorrect_answers();
 
-        //int correctAnswerPlace = new Random().nextInt(answers. - 1);
-        //Log.d("size", ""+correctAnswerPlace);
-        answers.add(questionItems.get(number).getCorrect_answer());
-        AnswerAdapter adapter = new AnswerAdapter(this, R.layout.answers, answers);
+        // add the correct answer on a random place in the possible answers
+        int randomNum = ThreadLocalRandom.current().nextInt(0, answers.size());
+        answers.add(randomNum,questionItems.get(number).getCorrect_answer());
 
+        adapter = new AnswerAdapter(this, R.layout.answers, answers);
         answersView.setAdapter(adapter);
     }
+
 
     public static Spanned fromHtml(String text){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -108,6 +120,17 @@ public class GamePlayActivity extends AppCompatActivity implements QuestionReque
         }
     }
 
+    @Override
+    public void postedHighscoresSuccess() {
+        Intent intent = new Intent(GamePlayActivity.this, HighscoreListActivity.class);
+        startActivity(intent);
+    }
+
+    @Override
+    public void postedHighscoreFailure(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+    }
+
     public class ItemClickListener implements AdapterView.OnItemClickListener {
 
         @Override
@@ -115,21 +138,31 @@ public class GamePlayActivity extends AppCompatActivity implements QuestionReque
 
             String answer = (String) parent.getItemAtPosition(position);
 
+            // When the user pressed the correct score, upgrade the score by 1.
             if (answer.equals(questionItems.get(questionNumber).getCorrect_answer())) {
                 score++;
             }
 
-
+            // When the last question is answered, post the score to the server and open the highscore page
             if (questionItems.size() - 1 == questionNumber) {
 
-                Intent intent = new Intent(GamePlayActivity.this, HighscoreListActivity.class);
-                startActivity(intent);
+                // Not clickable anymore
+                answersView.setAdapter(null);
+                question.setText("Loading Highscores");
 
+                // Upgrade the score with the chosen difficulty
+                score = score * gameDifficulty;
+                HighscoreItem highscore = new HighscoreItem(name, score);
+
+                Toast.makeText(GamePlayActivity.this, "SCORE: "+Integer.toString(score), Toast.LENGTH_LONG).show();
+                PostRequestHelper pra = new PostRequestHelper(getApplicationContext());
+                pra.postHighscores(GamePlayActivity.this, highscore);
             }
+
+            // Show next question
             else{
                 questionNumber++;
                 showQuestion(questionNumber);
-
             }
         }
     }

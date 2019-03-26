@@ -18,21 +18,19 @@ public class GetNameActivity extends AppCompatActivity {
         nameText = findViewById(R.id.name);
     }
 
-
+    // If the name is filled in, save the name and start the game. Otherwise the user will be asked to fill in a name
     public void start(View view){
 
         String name = nameText.getText().toString();
 
         if (name.equals("")){
-
             Toast.makeText(this, "Please fill in your name", Toast.LENGTH_SHORT).show();
         }
+
         else{
 
-            Intent intent = new Intent(GetNameActivity.this, GamePlayActivity.class);
-
+            Intent intent = new Intent(GetNameActivity.this, ChooseDifficultyActivity.class);
             intent.putExtra("name", name);
-
             startActivity(intent);
         }
     }

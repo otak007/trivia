@@ -22,17 +22,13 @@ public class AnswerAdapter extends ArrayAdapter<String> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.answers, parent, false);
         }
 
-        // Get all views
         TextView possibleAnswer = convertView.findViewById(R.id.possibleAnswer);
-
-        // Get the menu information
         String answer = answers.get(position);
-
-        // Set the menu information in the right views
         possibleAnswer.setText(answer);
 
         return convertView;

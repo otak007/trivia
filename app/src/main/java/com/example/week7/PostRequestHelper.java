@@ -13,14 +13,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-/*
-    Objects of this class can do POST requests with parameters.
-*/
 
 public class PostRequestHelper implements Response.ErrorListener, Response.Listener {
 
     private Context context;
     private HSCallback callbackActivity;
+    private String url = "http://ide50-gabeotagho.legacy.cs50.io:8080/highscore";
 
     public PostRequestHelper(Context context){
         this.context = context;
@@ -28,7 +26,7 @@ public class PostRequestHelper implements Response.ErrorListener, Response.Liste
 
 
     // een method die de request queue maakt etc
-    public void postHighscores(HSCallback activity) {
+    public void postHighscores(HSCallback activity, final HighscoreItem highscore) {
         RequestQueue queue = Volley.newRequestQueue(context);
 
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, this, this ){
@@ -37,13 +35,14 @@ public class PostRequestHelper implements Response.ErrorListener, Response.Liste
             protected Map<String, String> getParams() {
 
                 Map<String, String> params = new HashMap<>();
-                params.put("name", "Minor Programmeren");
-                params.put("studentcount", "300");
+                params.put("name", highscore.getName());
+                params.put("score", Integer.toString(highscore.getScore()));
                 return params;
             }
         };
-        queue.add(postRequest);
         callbackActivity = activity;
+        queue.add(postRequest);
+
     }
 
     public interface HSCallback {
@@ -51,8 +50,6 @@ public class PostRequestHelper implements Response.ErrorListener, Response.Liste
         void postedHighscoreFailure(String message);
     }
 
-    private int method;
-    private String url = "http://localhost:8080/list";
 
     @Override
     public void onErrorResponse(VolleyError error) {
@@ -61,7 +58,7 @@ public class PostRequestHelper implements Response.ErrorListener, Response.Liste
 
     @Override
     public void onResponse(Object response) {
-
+        callbackActivity.postedHighscoresSuccess();
     }
 
 }

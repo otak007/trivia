@@ -2,10 +2,11 @@ package com.example.week7;
 
 import org.json.JSONArray;
 
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
-public class QuestionItem {
+public class QuestionItem implements Serializable {
     String category, type, difficulty, question, correct_answer;
     ArrayList<String> incorrect_answers;
 

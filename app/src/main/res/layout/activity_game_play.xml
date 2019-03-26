@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_margin="20dp"
     android:orientation="vertical"
     tools:context=".GamePlayActivity">
 
@@ -11,12 +12,17 @@
         android:id="@+id/question"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="40dp"
         android:layout_weight="0"
-        android:text="question" />
+        android:text="Loading question"
+        android:textSize="17dp"
+        android:textStyle="bold" />
+
 
     <ListView
         android:id="@+id/answers"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:divider="@color/colorPrimary"/>
 </LinearLayout>
