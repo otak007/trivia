@@ -31,14 +31,17 @@ public class ChooseDifficultyActivity extends AppCompatActivity {
             case R.id.easy:
                 url = "https://opentdb.com/api.php?amount=10&difficulty=easy";
                 difficultyScaler = 1;
+                break;
 
             case R.id.medium:
                 url = "https://opentdb.com/api.php?amount=10&difficulty=medium";
                 difficultyScaler = 2;
+                break;
 
             case R.id.hard:
                 url = "https://opentdb.com/api.php?amount=10&difficulty=hard";
                 difficultyScaler = 3;
+                break;
         }
 
         GameProperties gameProperties = new GameProperties(name, url, difficultyScaler);
