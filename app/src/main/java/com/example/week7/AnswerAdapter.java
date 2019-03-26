@@ -1,6 +1,9 @@
 package com.example.week7;
 
 import android.content.Context;
+import android.os.Build;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,8 +32,15 @@ public class AnswerAdapter extends ArrayAdapter<String> {
 
         TextView possibleAnswer = convertView.findViewById(R.id.possibleAnswer);
         String answer = answers.get(position);
-        possibleAnswer.setText(answer);
+        possibleAnswer.setText(fromHtml(answer));
 
         return convertView;
+    }
+    public static Spanned fromHtml(String text){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            return Html.fromHtml(text);
+        }
     }
 }
