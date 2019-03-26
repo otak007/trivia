@@ -147,7 +147,7 @@ public class GamePlayActivity extends AppCompatActivity implements QuestionReque
 
             // When the user pressed wrong answer, show the correct answer
             else{
-                Toast.makeText(GamePlayActivity.this, "Wrong answer. Good answer: "+correctAnswer, Toast.LENGTH_SHORT).show();
+                Toast.makeText(GamePlayActivity.this, "Wrong answer. Good answer: "+fromHtml(correctAnswer), Toast.LENGTH_SHORT).show();
             }
 
             // When the last question is answered, post the score to the server and open the highscore page
